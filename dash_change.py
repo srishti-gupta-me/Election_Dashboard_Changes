@@ -13,7 +13,7 @@ import geopandas as gpd
 from plotly.subplots import make_subplots
 
 
-
+#Adds favicon to the website and set page title 
 favicon_image = Image.open('ashoka.jpeg')
 st.set_page_config(page_title="Previous Election Insights", page_icon=favicon_image, layout="wide")
 
@@ -30,6 +30,7 @@ footer {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
+#To reduce padding between containers in the application
 padding = 0
 st.markdown(f""" <style>
     .reportview-container .main .block-container{{
@@ -156,12 +157,12 @@ linkers=""" <style>
 <div class="grid-container">
  <div class="grid-item"><a href=#linkto_nota><button class="button-css">NOTA</button></a></div>
  <div class="grid-item"><a href=#linkto_party><button class="button-css">Contesting Parties</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Female Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Male Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Constituencies</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Women Winners</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Newcomers</button></a></div>
+ <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Voter Turnout</button></a></div>
+ <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Female Voter Turnout</button></a></div>
+ <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Male Voter Turnout</button></a></div>
+ <div class="grid-item"><a href=#linkto_cons><button class="button-css">Constituencies</button></a></div>
+ <div class="grid-item"><a href=#linkto_women><button class="button-css">Women Winners</button></a></div>
+ <div class="grid-item"><a href=#linkto_newcomer><button class="button-css">Newcomers</button></a></div>
 </div>
 
 
@@ -170,6 +171,10 @@ landing_con_3.markdown(linkers, unsafe_allow_html=True)
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
+
+
+
+#Bar Chart function 
 @st.cache
 def bar_chart(df,x_var,y_var, title="", x_axis_title="",y_axis_title=""):
     fig = px.bar(
@@ -187,10 +192,10 @@ def bar_chart(df,x_var,y_var, title="", x_axis_title="",y_axis_title=""):
         height=500,
         title={
         'text': title,
-        'y':0.9,
-        'x':0.5,
+        'y':1,
+        'x':0.6,
         'xanchor':'center',
-        'yanchor':'bottom'}
+        'yanchor':'top'}
     )
 
     fig.update_xaxes(
@@ -209,116 +214,178 @@ def bar_chart(df,x_var,y_var, title="", x_axis_title="",y_axis_title=""):
             color="white"
         ),
     )
+import json
+with open('./India_States.geojson') as f:
+    gj = json.load(f)
+    
+
+#Map function 
+@st.cache
+def map(df,x,df_1, title_fig=''):
+    
+    fig = px.choropleth(df_1, geojson=gj, locations='ST_NM', color='Value',
+                               featureidkey="properties.ST_NM",
+                               color_discrete_sequence=["rgb(211,211,211)"],
+                               
+                               
+                              )
+    fig.add_trace(go.Choropleth(featureidkey='properties.ST_NM',
+                                  geojson=gj,
+                                  locations=df['State_Name'],
+                                  z=df["{}".format(x)],
+                                  colorscale=[[0, 'rgb(224,176,255)'], [1, 'rgb(128,0,128)']],
+                                  #colorscale='viridis',
+                                  showscale=False                      
+                                 ))
+  
+
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(title={'text': "{}".format(title_fig),
+        'x':0.465,
+        'y':0,
+        'xanchor': 'center',
+        'yanchor': 'bottom'},
+         margin=dict(l=0, r=0, t=0, b=0),showlegend=False)
+    fig.update_xaxes(mirror=True)
+
+    return(fig)
+
+
+#To create base map
+df_null= pd.read_csv("./states_shapefile_name.csv",dtype={"State": str})
+
+#Need 6 containers which are horizontal 
+
+
 
 #NOTA
 st.markdown("<div id='linkto_nota'></div>", unsafe_allow_html=True)   
+
+
+nota_head_container=st.container()
+nota_1,nota_2,nota_3=nota_head_container.columns([2,2,1])
+nota_2.title('NOTA Percentage')
+
+
+nota_body_container=st.container()
+nota_b1,nota_b2,nota_b3=nota_body_container.columns([1,3,1])
+
+csv = st.cache(suppress_st_warning=True)(pd.read_csv)
+df_nota= csv("./data/nota.csv",dtype={"State_Name": str})
+nota_b2.plotly_chart(map(df_nota,'Percentage',df_null),use_container_width=True)
+
+st.markdown("""<hr/>""", unsafe_allow_html=True)
  
-# nota_container=st.container()
-# nota_container.subheader('NOTA Percentage')
-# nota_1,nota_2, nota_3=nota_container.columns([2,0.5,2.5])
+#Contesting and Represented Parties
+
+st.markdown("<div id='linkto_party'></div>", unsafe_allow_html=True)   
+
+
+party_head_container=st.container()
+party_1,party_2,party_3=party_head_container.columns([1.4,2,1])
+party_2.title('Party Contested and Represented')
+
+party_body_container=st.container()
+party_b1,party_b2=party_body_container.columns([1,1])
+
+df_party= csv("./data/party.csv",dtype={"State_Name": str})
+
+party_b1.plotly_chart(map(df_party,'Contested_Count',df_null,'Contested'),use_container_width=True)
+party_b2.plotly_chart(map(df_party,'Represented_Count',df_null,'Represented'),use_container_width=True)
+
+st.markdown("""<hr/>""", unsafe_allow_html=True)
+
+#Voter Turnout
+
+st.markdown("<div id='linkto_turnout'></div>", unsafe_allow_html=True)   
+
+
+vot_head_container=st.container()
+vot_1,vot_2,vot_3=vot_head_container.columns([2,2,1])
+vot_2.title('Voter Turnout')
 
 
 
-# nota_2.markdown("""
-# <style>
-# .vl {
-#   border-left: 0.1vw solid grey;
-#   margin-left: 3vw;
-#   height:80vh;
-# }
-# </style>
-# <div class="vl"></div>
-# """, unsafe_allow_html=True)
+df_vot=csv("./data/voter.csv",dtype={"State_Name": str})
+
+st.plotly_chart(map(df_vot,'total',df_null,'Overall'),use_container_width=True)
+
+vot_body_container=st.container()
+vot_b1,vot_b2=vot_body_container.columns([1,1])
+vot_b1.plotly_chart(map(df_vot,'male',df_null,'Male Turnout'),use_container_width=True)
+vot_b2.plotly_chart(map(df_vot,'female',df_null,'Female Turnout'),use_container_width=True)
+
+st.markdown("""<hr/>""", unsafe_allow_html=True)
+
+#Constituencies 
+
+st.markdown("<div id='linkto_cons'></div>", unsafe_allow_html=True)   
+df_con=csv("./data/constituencies.csv",dtype={"State_Name": str})
+
+cons_head_container=st.container()
+cons_1,cons_2,cons_3=cons_head_container.columns([2,2,1])
+cons_2.title('Constituencies')
+
+cons_body_container=st.container()
+cons_b1,cons_b2=cons_body_container.columns([1,1])
+
+#Group Bar Chart
+fig_1 = go.Figure()
+fig_1.add_trace(go.Bar(
+    x=df_con[df_con['Constituency_Type']=='GEN']['State_Name'],
+    y=df_con[df_con['Constituency_Type']=='GEN']['count_i'],
+    name='GEN',
+    marker_color='purple'
+))
+fig_1.add_trace(go.Bar(
+    x=df_con[df_con['Constituency_Type']=='SC']['State_Name'],
+    y=df_con[df_con['Constituency_Type']=='SC']['count_i'],
+    name='SC',
+    marker_color='red'
+))
+fig_1.add_trace(go.Bar(
+    x=df_con[df_con['Constituency_Type']=='ST']['State_Name'],
+    y=df_con[df_con['Constituency_Type']=='ST']['count_i'],
+    name='ST',
+    marker_color='yellow'
+))
+fig_1.update_layout(barmode='group')
+
+cons_b1.plotly_chart(fig_1,use_container_width=True)
+cons_b2.plotly_chart(map(df_con,'total',df_null,'Total Constituencies'),use_container_width=True)
+
+st.markdown("""<hr/>""", unsafe_allow_html=True)
+
+#Women and New-Comer
+
+st.markdown("<div id='linkto_women'></div>", unsafe_allow_html=True)  
+st.markdown("<div id='linkto_newcomer'></div>", unsafe_allow_html=True)   
+
+wo_head_container=st.container()
+wo_1,wo_2,wo_3,wo_4,wo_5,wo_6=wo_head_container.columns([1,2,1,1,2,1])
+
+wo_2.title('Women Winners')
+wo_5.title('Newcomers')
+
+wo_body_container=st.container()
+
+wo_b1,wo_b2=wo_body_container.columns([1,1])
+
+df_women=csv("./data/women_winner.csv",dtype={"State_Name": str})
+df_newcomer=csv("./data/newcomer.csv",dtype={"State_Name": str})
 
 
-
-# read_and_cache_csv = st.cache(suppress_st_warning=True)(pd.read_csv)
-# data = read_and_cache_csv('./nota.csv', nrows=100000)
-
-# nota_1.plotly_chart(bar_chart(data.astype(str), data['State'],data['Value'],"","State","Percentage"), use_container_width=True)
-
-# #nota_3.image('./geo.png')
-
-# st.markdown("""<hr/>""", unsafe_allow_html=True)
-
-# #Parties
-
-# st.markdown("<div id='linkto_party'></div>", unsafe_allow_html=True)   
- 
-# party_container=st.container()
-# party_container.subheader('Contesting Parties')
-
-# party_1,party_2, party_3=party_container.columns([2,0.5,2.5])
-
-# read_and_cache_csv = st.cache(suppress_st_warning=True)(pd.read_csv)
-# data = read_and_cache_csv('./nota.csv', nrows=100000)
-
-# party_1.plotly_chart(bar_chart(data.astype(str), data.State,data.Value,"","State","Percentage"), use_container_width=True)
+wo_b1.plotly_chart(map(df_women,'count',df_null,''),use_container_width=True)
+wo_b2.plotly_chart(map(df_newcomer,'count',df_null,''),use_container_width=True)
 
 
-# st.markdown("""<hr/>""", unsafe_allow_html=True)
+st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
-
-# party_2.markdown("""
-# <style>
-# .vl {
-#   border-left: 0.1vw solid grey;
-#   margin-left: 3vw;
-#   height:80vh;
-# }
-# </style>
-# <div class="vl"></div>
-# """, unsafe_allow_html=True)
-
-
-# def map_plot(file_link, container_name, color):
-#     map_df = gpd.read_file("./maps-master/States/Admin2.shp")
-#     map_value= pd.read_csv(file_link)
-#     merged = map_df.merge(map_value, how='left', left_on="ST_NM",right_on="State")
-#     merged.drop(['State'], axis=1, inplace=True)
-#     merged['Value']=merged['Value'].mask(merged['Value'].isnull()==True,-1)
-
-#     # set the value column that will be visualised
-#     variable = 'Value'
-#     # set the range for the choropleth values
-#     vmin, vmax = 0, 100
-
-#     # create figure and axes for Matplotlib
-#     fig, ax = plt.subplots(1, figsize=(30, 10))
-#     # remove the axis
-#     ax.axis('off')
-
-
-#     # Create colorbar legend
-#     sm = plt.cm.ScalarMappable(cmap=color, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-#     # empty array for the data range
-#     sm.set_array([]) # or alternatively sm._A = []. Not sure why this step is necessary, but many recommends it
-#     # add the colorbar to the figure
-#     # fig.colorbar(sm)
-
-#     # create map
-#     merged.plot(column=variable, cmap=color, linewidth=0.8, ax=ax, edgecolor='0.8')
-
-#     # Add Labels
-#     merged['coords'] = merged['geometry'].apply(lambda x: x.representative_point().coords[:])
-#     merged['coords'] = [coords[0] for coords in merged['coords']]
-
-#     states=['Manipur','Punjab','Uttarakhand','Goa','Uttar Pradesh']
-
-#     for idx, row in merged.iterrows():
-
-#         if row['ST_NM'] in states:
-#             plt.annotate(text=row['Value'], xy=row['coords'],horizontalalignment='center')
-
-#     container_name.pyplot(fig)
-    
-# map_plot("nota.csv",nota_3,"Blues")
-# map_plot("party.csv",party_3,"Oranges")
 
 
 assembly_head_container=st.container()
-assh_1,assh_2,assh_3=assembly_head_container.columns([1.2,2,1])
+assh_1,assh_2,assh_3=assembly_head_container.columns([1,2,1])
 assh_2.title('General Elections with Assembly Numbers')
 
 assembly_container=st.container()
@@ -339,183 +406,6 @@ ass_3.markdown("<br/><br/>",unsafe_allow_html=True)
 ass_3.plotly_chart(fig_2, use_container_width=True)
 
 st.markdown("""<hr/>""", unsafe_allow_html=True)
-
-voter_head_container=st.container()
-voterh_1,voterh_2,voterh_3=voter_head_container.columns([3.5,2,3])
-voterh_2.title('Voter Turnout')
-
-
-voter_container=st.container()
-voter_1,voter_2,voter_3=voter_container.columns([1,3,1])
-voter=ass_csv('./voterturnout.csv', nrows=100000)
-
-fig = px.bar(voter, x="Year", y="total", animation_frame="State_Name", animation_group="Year",color="State_Name", hover_name="Assembly_No", range_x=[1960,2022], range_y=[0,100], height=600, width=1000)
-
-fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 2000
-fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 500
-
-
-fig.update_layout(
-      title={'text': "",
-        'y':1,
-        'x':0.5,
-        'xanchor': 'center',
-        'yanchor': 'top'},
-    xaxis_title="Assembly Number",
-    yaxis_title="Turnout Percentage",
-    legend_title="State Name",
-    barmode='group', height=600, width=600)
-
-voter_2.plotly_chart(fig, use_container_width=True)
-
-
-
-fig = make_subplots(rows=1, cols=3, subplot_titles=("Voter Turnout-All", "Voter Turnout-Male", "Voter Turnout-Female"))
-
-
-# All
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Assembly_No'],
-    y=voter[voter['State_Name']=='Goa']['total'],
-    name='Goa',
-    marker_color='purple'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Assembly_No'],
-    y=voter[voter['State_Name']=='Manipur']['total'],
-    name='Manipur',
-    marker_color='green'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Assembly_No'],
-    y=voter[voter['State_Name']=='Punjab']['total'],
-    name='Punjab',
-    marker_color='red'
-),row=1, col=1)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttarakhand']['total'],
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['total'],
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=1)
-
-
-#Male
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Assembly_No'],
-    y=voter[voter['State_Name']=='Goa']['male'],showlegend=False,
-    name='Goa',
-    marker_color='purple'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Assembly_No'],
-    y=voter[voter['State_Name']=='Manipur']['male'],showlegend=False,
-    name='Manipur',
-    marker_color='green'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Assembly_No'],
-    y=voter[voter['State_Name']=='Punjab']['male'],showlegend=False,
-    name='Punjab',
-    marker_color='red'
-),row=1, col=2)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttarakhand']['male'],showlegend=False,
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['male'],showlegend=False,
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=2)
-
-
-
-#Female
-
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Assembly_No'],
-    y=voter[voter['State_Name']=='Goa']['female'],showlegend=False,
-    name='Goa',
-    marker_color='purple'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Assembly_No'],
-    y=voter[voter['State_Name']=='Manipur']['female'],showlegend=False,
-    name='Manipur',
-    marker_color='green'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Assembly_No'],
-    y=voter[voter['State_Name']=='Punjab']['female'],showlegend=False,
-    name='Punjab',
-    marker_color='red'
-),row=1, col=3)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttarakhand']['female'],showlegend=False,
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Assembly_No'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['female'], showlegend=False,
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=3)
-
-
-#Layout
-
-fig.update_layout(
-    
-      title={'text': "Voter Turnout- All",
-        'y':1,
-        'x':0.5,
-        'xanchor': 'center',
-        'yanchor': 'top'},
-    legend_title="State Name",
-    barmode='group', height=550, width=500)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=1)
-fig.update_xaxes(title_text="Assembly Number",range=[0,18], row=1, col=1)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=2)
-fig.update_xaxes(title_text="Assembly Number",range=[0,18], row=1, col=2)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=3)
-fig.update_xaxes(title_text="Assembly Number",range=[0,18], row=1, col=3)
-
-
-st.plotly_chart(fig,use_container_width=True)
 
 
 
