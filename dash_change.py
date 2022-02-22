@@ -20,15 +20,16 @@ st.set_page_config(page_title="Previous Election Insights", page_icon=favicon_im
 
 
 
-# # #To hide hamburger menu
+#To hide hamburger menu
 
-# # hide_streamlit_style = """
-# # <style>
-# # #MainMenu {visibility: hidden;}
-# # footer {visibility: hidden;}
-# # </style>
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+"""
 
-# # """
+
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
 #To reduce padding between containers in the application
@@ -179,7 +180,7 @@ with open('./India_States.geojson') as f:
     gj = json.load(f)
     
 
-#Map function 
+#Voter Turnout Map
 @st.cache
 def map(df,x,df_1, title_fig=''):
     
@@ -192,9 +193,9 @@ def map(df,x,df_1, title_fig=''):
                                   geojson=gj,
                                   locations=df['State_Name'],
                                   z=df["{}".format(x)],
-                                  colorscale=[[0, 'rgb(224,176,255)'], [1, 'rgb(128,0,128)']],
+                                  colorscale=[[0, 'rgb(255, 229, 180)'], [1, 'rgb(248, 131, 121)']],
                                   #colorscale='viridis',
-                                  showscale=False                      
+                                  showscale=True                      
                                  ))
   
 
@@ -210,10 +211,10 @@ def map(df,x,df_1, title_fig=''):
     return(fig)
 
 
+
+
 #To create base map
 df_null= pd.read_csv("./states_shapefile_name.csv",dtype={"State": str})
-
-
 csv = st.cache(suppress_st_warning=True)(pd.read_csv)
 
 #Voter Turnout
@@ -221,160 +222,13 @@ voter_head_container=st.container()
 voterh_1,voterh_2,voterh_3=voter_head_container.columns([3.5,2,3])
 voterh_2.title('Voter Turnout')
 
-
 voter_container=st.container()
-voter_1,voter_2,voter_3=voter_container.columns([1,3,1])
-voter=csv('./voterturnout.csv', nrows=100000)
+voter_1,voter_2,voter_3=voter_container.columns([0.5,3,1])
+voter=pd.read_csv('./data/voter.csv')
 
 
-
-fig = make_subplots(rows=1, cols=3, subplot_titles=("Voter Turnout-All", "Voter Turnout-Male", "Voter Turnout-Female"))
-
-
-# All
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Year'],
-    y=voter[voter['State_Name']=='Goa']['total'],
-    name='Goa',
-    marker_color='purple'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Year'],
-    y=voter[voter['State_Name']=='Manipur']['total'],
-    name='Manipur',
-    marker_color='green'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Year'],
-    y=voter[voter['State_Name']=='Punjab']['total'],
-    name='Punjab',
-    marker_color='red'
-),row=1, col=1)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Year'],
-    y=voter[voter['State_Name']=='Uttarakhand']['total'],
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=1)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Year'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['total'],
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=1)
-
-
-#Male
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Year'],
-    y=voter[voter['State_Name']=='Goa']['male'],showlegend=False,
-    name='Goa',
-    marker_color='purple'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Year'],
-    y=voter[voter['State_Name']=='Manipur']['male'],showlegend=False,
-    name='Manipur',
-    marker_color='green'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Year'],
-    y=voter[voter['State_Name']=='Punjab']['male'],showlegend=False,
-    name='Punjab',
-    marker_color='red'
-),row=1, col=2)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Year'],
-    y=voter[voter['State_Name']=='Uttarakhand']['male'],showlegend=False,
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=2)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Year'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['male'],showlegend=False,
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=2)
-
-
-
-#Female
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Goa']['Year'],
-    y=voter[voter['State_Name']=='Goa']['female'],showlegend=False,
-    name='Goa',
-    marker_color='purple'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Manipur']['Year'],
-    y=voter[voter['State_Name']=='Manipur']['female'],showlegend=False,
-    name='Manipur',
-    marker_color='green'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Punjab']['Year'],
-    y=voter[voter['State_Name']=='Punjab']['female'],showlegend=False,
-    name='Punjab',
-    marker_color='red'
-),row=1, col=3)
-
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttarakhand']['Year'],
-    y=voter[voter['State_Name']=='Uttarakhand']['female'],showlegend=False,
-    name='Uttarakhand',
-    marker_color='yellow'
-),row=1, col=3)
-
-fig.add_trace(go.Line(
-    x=voter[voter['State_Name']=='Uttar_Pradesh']['Year'],
-    y=voter[voter['State_Name']=='Uttar_Pradesh']['female'], showlegend=False,
-    name='Uttar Pradesh',
-    marker_color='blue'
-),row=1, col=3)
-
-
-#Layout
-
-fig.update_layout(
-    
-      title={'text': "Voter Turnout- All",
-        'y':1,
-        'x':0.5,
-        'xanchor': 'center',
-        'yanchor': 'top'},
-    legend_title="State Name",
-    barmode='group', height=550, width=500)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=1)
-fig.update_xaxes(title_text="Year",range=[1960,2022], row=1, col=1)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=2)
-fig.update_xaxes(title_text="Year",range=[1960,2022], row=1, col=2)
-
-fig.update_yaxes(title_text="Turnout Percentage",range=[0,100],row=1, col=3)
-fig.update_xaxes(title_text="Year",range=[1960,2022], row=1, col=3)
-
-
-st.plotly_chart(fig,use_container_width=True)
-
-
-st.markdown("""<hr/>""", unsafe_allow_html=True)
+config = dict({'scrollZoom': False})
+voter_2.plotly_chart(map(voter,'Percentage',df_null), use_container_width=True,**{'config': config})
 
 
 #Women Winner and Contestant
@@ -461,6 +315,9 @@ const_2.title('Constituencies')
 const_bar_container=st.container()
 const_bar_1,const_bar_2, const_bar_3=const_bar_container.columns([1,3,1])
 const_bar_2.plotly_chart(fig,use_container_width=True)
+
+
+
 
 
 
