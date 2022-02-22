@@ -348,11 +348,64 @@ per_2.title('Party Seat Share Across States')
 components.html("""
 """, height=10)
 
+
+components.html("""
+<html>
+  
+<head>
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();
+</script>
+  
+<style>
+body {
+  height: 800px;  
+} 
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  margin-left:0vw;
+  margin-right:0vw;
+  margin-top:5vh;
+  position: absolute;
+  grid-gap:5vw;
+  text-align: center;
+}
+
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0);
+  font-size: 10vh;
+  border-radius: 0px;
+  padding: 0px;
+  font-size: 30px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<main>
+
+ <div class="grid-container">
+   
+  <div class="grid-item"><iframe title="INC" aria-label="Map" id="datawrapper-chart-kVAmg" src="https://datawrapper.dwcdn.net/kVAmg/2/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></div>
+   
+  <div class="grid-item"><iframe title="BJP" aria-label="Map" id="datawrapper-chart-XigkX" src="https://datawrapper.dwcdn.net/XigkX/2/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></iframe></div>
+      
+  <div class="grid-item"><iframe title="IND" aria-label="Map" id="datawrapper-chart-lbr1c" src="https://datawrapper.dwcdn.net/lbr1c/3/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></div>
+   
+</div>
+</main>
+</body>
+</html>
+
+""", height=800)
+
 components.html("""
 <iframe title="" aria-label="Split Bars" id="datawrapper-chart-gqCpm" src="https://datawrapper.dwcdn.net/gqCpm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="120"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();
 </script>
 
-""", height=100, width=800)
+""", height=100)
 
 
 party_container=st.container()
@@ -365,11 +418,5 @@ party_b1.plotly_chart(map(party_presence[party_presence['Party']=='BJP'],df_null
 party_b2.plotly_chart(map(party_presence[party_presence['Party']=='INC'],df_null,'Party_Seat_Percentage','INC', False), **{'config': config}, use_container_width=True)
 
 party_b3.plotly_chart(map(party_presence[party_presence['Party']=='IND'],df_null,'Party_Seat_Percentage','IND',False), **{'config': config}, use_container_width=True)
-
-
-
-
-
-
 
 
