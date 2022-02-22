@@ -23,7 +23,7 @@ st.set_page_config(page_title="Previous Election Insights", page_icon=favicon_im
 #To hide hamburger menu
 
 
-st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
+#st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
 #To reduce padding between containers in the application
 padding = 0
