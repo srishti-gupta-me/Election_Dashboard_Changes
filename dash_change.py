@@ -120,7 +120,7 @@ linkers=""" <style>
   
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: auto auto auto;
   margin-left:0vw;
   margin-right:0vw;
   margin-top:5vh;
@@ -149,14 +149,11 @@ linkers=""" <style>
 }</style>
 
 <div class="grid-container">
- <div class="grid-item"><a href=#linkto_nota><button class="button-css">NOTA</button></a></div>
- <div class="grid-item"><a href=#linkto_party><button class="button-css">Contesting Parties</button></a></div>
- <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Female Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_turnout><button class="button-css">Male Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#linkto_cons><button class="button-css">Constituencies</button></a></div>
- <div class="grid-item"><a href=#linkto_women><button class="button-css">Women Winners</button></a></div>
- <div class="grid-item"><a href=#linkto_newcomer><button class="button-css">Newcomers</button></a></div>
+ <div class="grid-item"><a href=#1><button class="button-css">Voter Turnout</button></a></div>
+ <div class="grid-item"><a href=#2><button class="button-css">Constituencies</button></a></div>
+ <div class="grid-item"><a href=#3><button class="button-css">Women Representation</button></a></div>
+ <div class="grid-item"><a href=#4><button class="button-css">Party Seat Share</button></a></div>
+ <div class="grid-item"><a href=#5><button class="button-css">Seat Share Across States</button></a></div>
 </div>
 
 
@@ -207,7 +204,31 @@ df_null= pd.read_csv("./states_shapefile_name.csv",dtype={"State": str})
 
 csv = st.cache(suppress_st_warning=True, allow_output_mutation=True)(pd.read_csv)
 
+#Voter Turnout
+st.markdown("<div id='1'></div>", unsafe_allow_html=True) 
+
+voter_head_container=st.container()
+voterh_1,voterh_2,voterh_3=voter_head_container.columns([3.5,2,3])
+voterh_2.title('Voter Turnout')
+
+voter_container=st.container()
+voter_1,voter_2,voter_3=voter_container.columns([0.5,3,1])
+voter=pd.read_csv('./data/voter.csv')
+
+config = dict({'scrollZoom': False})
+#voter_2.plotly_chart(map(voter,df_null,'Percentage','',True), use_container_width=True,**{'config': config})
+
+components.html("""
+<iframe title="" aria-label="Map" id="datawrapper-chart-wFZd3" src="https://datawrapper.dwcdn.net/wFZd3/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="729"></iframe>
+
+""", height=750)
+
+st.markdown("""<hr/>""", unsafe_allow_html=True)
+
+
 #Constituencies percentage
+st.markdown("<div id='2'></div>", unsafe_allow_html=True) 
+
 
 constituencies=pd.read_csv('./data/constituencies.csv')
 constituencies['Percentage']=np.nan
@@ -241,6 +262,8 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
 #Women Winner and Contestant
+
+st.markdown("<div id='3'></div>", unsafe_allow_html=True) 
 
 women_head_container=st.container()
 women_1,women_2,women_3=women_head_container.columns([2.5,3,2])
@@ -294,29 +317,11 @@ women_2.plotly_chart(fig,use_container_width=True)
 
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
-#Voter Turnout
-voter_head_container=st.container()
-voterh_1,voterh_2,voterh_3=voter_head_container.columns([3.5,2,3])
-voterh_2.title('Voter Turnout')
-
-voter_container=st.container()
-voter_1,voter_2,voter_3=voter_container.columns([0.5,3,1])
-voter=pd.read_csv('./data/voter.csv')
-
-config = dict({'scrollZoom': False})
-#voter_2.plotly_chart(map(voter,df_null,'Percentage','',True), use_container_width=True,**{'config': config})
-
-components.html("""
-<iframe title="" aria-label="Map" id="datawrapper-chart-wFZd3" src="https://datawrapper.dwcdn.net/wFZd3/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="729"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();
-</script>
-
-""", height=800)
-
-st.markdown("""<hr/>""", unsafe_allow_html=True)
-
 
 
 #Party Seat Share
+st.markdown("<div id='4'></div>", unsafe_allow_html=True) 
+
 
 party_head_container=st.container()
 party_1,party_2,party_3=party_head_container.columns([3,3,2])
@@ -341,6 +346,9 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
 #Party Performance Across States
+
+st.markdown("<div id='5'></div>", unsafe_allow_html=True) 
+
 per_container=st.container()
 per_1,per_2,per_3=per_container.columns([3,3,2])
 per_2.title('Party Seat Share Across States')
@@ -408,15 +416,15 @@ components.html("""
 """, height=100)
 
 
-party_container=st.container()
-party_b1,party_b2, party_b3=party_container.columns([1,1,1])
+# party_container=st.container()
+# party_b1,party_b2, party_b3=party_container.columns([1,1,1])
 
-party_presence=csv('./data/party_presence.csv')
+# party_presence=csv('./data/party_presence.csv')
 
-party_b1.plotly_chart(map(party_presence[party_presence['Party']=='BJP'],df_null, 'Party_Seat_Percentage','BJP',False), **{'config': config}, use_container_width=True)
+# party_b1.plotly_chart(map(party_presence[party_presence['Party']=='BJP'],df_null, 'Party_Seat_Percentage','BJP',False), **{'config': config}, use_container_width=True)
 
-party_b2.plotly_chart(map(party_presence[party_presence['Party']=='INC'],df_null,'Party_Seat_Percentage','INC', False), **{'config': config}, use_container_width=True)
+# party_b2.plotly_chart(map(party_presence[party_presence['Party']=='INC'],df_null,'Party_Seat_Percentage','INC', False), **{'config': config}, use_container_width=True)
 
-party_b3.plotly_chart(map(party_presence[party_presence['Party']=='IND'],df_null,'Party_Seat_Percentage','IND',False), **{'config': config}, use_container_width=True)
+# party_b3.plotly_chart(map(party_presence[party_presence['Party']=='IND'],df_null,'Party_Seat_Percentage','IND',False), **{'config': config}, use_container_width=True)
 
 
