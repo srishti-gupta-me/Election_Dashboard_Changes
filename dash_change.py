@@ -93,7 +93,6 @@ st.markdown("<div id='1'></div>", unsafe_allow_html=True)
 st.markdown("""<div style="text-align:center;"><h2>Voter Turnout</h2></div>""", unsafe_allow_html=True) 
 
 voter_container=st.container()
-voter_1,voter_2,voter_3=voter_container.columns([0.5,3,1])
 voter=pd.read_csv('./data/voter.csv')
 
 config = dict({'scrollZoom': False})
@@ -140,7 +139,7 @@ fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
 
 
 const_bar_container=st.container()
-const_bar_1,const_bar_2, const_bar_3=const_bar_container.columns([1,3,1])
+const_bar_1,const_bar_2, const_bar_3=const_bar_container.columns([0.5,3,0.5])
 const_bar_2.plotly_chart(fig,use_container_width=True)
 
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
@@ -155,7 +154,7 @@ st.markdown("<div id='3'></div>", unsafe_allow_html=True)
 st.markdown("""<div style="text-align:center;"><h2>Women Winner and Contestants</h2></div>""", unsafe_allow_html=True) 
 
 women_container=st.container()
-women_1,women_2, women_3=women_container.columns([1,3,1])
+women_1,women_2, women_3=women_container.columns([0.5,3,0.5])
 
 contest=pd.read_csv('./data/contestant.csv')
 contest['Women Percentage across Contestants']=np.nan
@@ -222,7 +221,7 @@ fig.update_traces(insidetextorientation='radial',  hovertemplate="<br>".join([
     ]))
 
 party_seat=st.container()
-party_seat_1,party_seat_2,party_seat_3=party_seat.columns([1,3,1])
+party_seat_1,party_seat_2,party_seat_3=party_seat.columns([0.5,3,0.5])
 party_seat_2.plotly_chart(fig,use_container_width=True)
 
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
