@@ -37,130 +37,17 @@ st.markdown(f""" <style>
     }} </style> """, unsafe_allow_html=True)
 
 
-#Landing Page 
-components.html("""<html>
-<style>
-
-body {
-  background-color: white;
-} 
-
-#title
-{ text-align: center;
-font-family: Arial;
-font-size: 3vw;
-padding: 0px;
-margin-top:0vh;
-margin-left:20vw;
-position: absolute;
-}
-
-#sub-heading
-{ text-align: center;
-font-family: Arial;
-font-size: 1.8vw;
-padding: 0px;
-margin-top:30vh;
-margin-left:50vw;
-position: absolute;
-}
-
-#logo
-{
-  margin-top:0vh;
-  margin-left:85vw;
-  margin-right:auto;
-  position: absolute;
-  width:5vw;
-  height: auto;
-}
 
 
-</style>
-<html>
-<body>
-
-<main>
-<h1 id="title">Assembly Elections 2022<h1>
-<p id="sub-heading"><i>Metrics from the past</i><p>
-
-<img id="logo" src="https://github.com/srishti-gupta-me/Election_Dashboard/blob/main/logo.png?raw=true"/>
-  
-</main>
-</body>
-</html>
-""", height=150)
-
-landing_con=st.container()
-
-landing_con_1, landing_con_2, landing_con_3, landing_con_4=landing_con.columns([0.5,1.5,1.5,0.5])
-
-bg=Image.open(r'./initial_bg.png')
-
-with landing_con_2:
-    st.image(bg, use_column_width='always')  
-
-original_title = '<p style="font-family:Arial; font-size: 1vw; margin-top: 15vh;">Click on any of the links below to see what the numbers looked like in the last round of elections for the poll bound states of Punjab, Uttarakhand, Uttar Pradesh, Manipur and Goa.</p>'
-
-landing_con_3.markdown(original_title, unsafe_allow_html=True)
 
 
-def local_css(file_name):
+
+def local_html(file_name):
     with open(file_name) as f:
-        st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
+        st.markdown('{}'.format(f.read()), unsafe_allow_html=True)
 
-local_css("style.css")
-
-
-linkers=""" <style>  
-  a {
-   justify-content: center;
-  align-items: center;
-  }
-  
-.grid-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  margin-left:0vw;
-  margin-right:0vw;
-  margin-top:5vh;
-  position: relative;
-  text-align: center;
-  grid-gap: 2vh 1vw;
-}
-
-.grid-item {
-  background-color: rgba(255, 255, 255, 1);
-  border: 1px solid rgba(0, 0, 0, 0);
-  font-size: 1vw;
-   
-}
-
-.button-css {
-
-  padding: 0px 10px;
-  background-color: rgba(255, 218, 88, 1);;
-  color: #000;
-  height:8vh;
-  width:8vw;
-  border-radius: 10px;
-  text-align: center;
-  
-}</style>
-
-<div class="grid-container">
- <div class="grid-item"><a href=#1><button class="button-css">Voter Turnout</button></a></div>
- <div class="grid-item"><a href=#2><button class="button-css">Constituencies</button></a></div>
- <div class="grid-item"><a href=#3><button class="button-css">Women Representation</button></a></div>
- <div class="grid-item"><a href=#4><button class="button-css">Party Seat Share</button></a></div>
- <div class="grid-item"><a href=#5><button class="button-css">Seat Share Across States</button></a></div>
-</div>
-
-
-"""
-landing_con_3.markdown(linkers, unsafe_allow_html=True)
+local_html("new_landing.html")
 st.markdown("""<hr/>""", unsafe_allow_html=True)
-
 
 
 
@@ -359,72 +246,69 @@ components.html("""
 
 components.html("""
 <html>
-  
 <head>
-<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();
-</script>
+
   
 <style>
 body {
   height: 800px;  
 } 
-
-.grid-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  margin-left:0vw;
-  margin-right:0vw;
-  margin-top:5vh;
-  position: absolute;
-  grid-gap:5vw;
-  text-align: center;
+iframe{
+  width:50vw;
+}
+.flex-container {
+  display: flex;
+  flex-direction: row;
 }
 
-.grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0);
-  font-size: 10vh;
-  border-radius: 0px;
-  padding: 0px;
-  font-size: 30px;
-  text-align: center;
+.flex-item-left {
+<!--   background-color: #f1f1f1; -->
+  flex: 50%;
+  align-items: stretch;
+
+}
+
+.flex-item-right {
+<!--   background-color: dodgerblue; -->
+  flex: 50%;
+  align-items: stretch;
+
+}
+
+@media (max-width: 700px) {
+  .flex-container {
+    flex-direction: column;
+  }
+ 
+iframe{
+  width:90vw;
+}
+ 
 }
 </style>
 </head>
 <body>
 <main>
 
- <div class="grid-container">
+ <div class="flex-container">
    
-  <div class="grid-item"><iframe title="INC" aria-label="Map" id="datawrapper-chart-kVAmg" src="https://datawrapper.dwcdn.net/kVAmg/2/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></div>
+  <div class="flex-item-left"><iframe title="INC" aria-label="Map" id="datawrapper-chart-kVAmg" src="https://datawrapper.dwcdn.net/kVAmg/2/" scrolling="no" frameborder="0" style="border: none;" width="600" height="754"></iframe></div>
    
-  <div class="grid-item"><iframe title="BJP" aria-label="Map" id="datawrapper-chart-XigkX" src="https://datawrapper.dwcdn.net/XigkX/2/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></iframe></div>
-      
-  <div class="grid-item"><iframe title="IND" aria-label="Map" id="datawrapper-chart-lbr1c" src="https://datawrapper.dwcdn.net/lbr1c/3/" scrolling="no" frameborder="0" style="border: none;" width="500" height="600"></iframe></div>
-   
+  <div class="flex-item-right"><iframe title="BJP" aria-label="Map" id="datawrapper-chart-yg7Zy" src="https://datawrapper.dwcdn.net/yg7Zy/1/" scrolling="no" frameborder="0" style="border: none;" width="600" height="754"></iframe></iframe></div>
+  
 </div>
+
+<br><br>
+
+<div><iframe title="" aria-label="Split Bars" id="datawrapper-chart-gqCpm" src="https://datawrapper.dwcdn.net/gqCpm/2/" scrolling="no" frameborder="0" style="border: none;" width="600" height="96"></iframe></div>
+
 </main>
 </body>
 </html>
 
-""", height=800)
-
-components.html("""
-<iframe title="" aria-label="Split Bars" id="datawrapper-chart-gqCpm" src="https://datawrapper.dwcdn.net/gqCpm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="120"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();
-</script>
-
-""", height=100)
+""", height=1700)
 
 
-# party_container=st.container()
-# party_b1,party_b2, party_b3=party_container.columns([1,1,1])
 
-# party_presence=csv('./data/party_presence.csv')
-
-# party_b1.plotly_chart(map(party_presence[party_presence['Party']=='BJP'],df_null, 'Party_Seat_Percentage','BJP',False), **{'config': config}, use_container_width=True)
-
-# party_b2.plotly_chart(map(party_presence[party_presence['Party']=='INC'],df_null,'Party_Seat_Percentage','INC', False), **{'config': config}, use_container_width=True)
-
-# party_b3.plotly_chart(map(party_presence[party_presence['Party']=='IND'],df_null,'Party_Seat_Percentage','IND',False), **{'config': config}, use_container_width=True)
 
 
