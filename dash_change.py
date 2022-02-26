@@ -36,11 +36,7 @@ st.markdown(f""" <style>
         padding-bottom: {padding}rem;
     }} </style> """, unsafe_allow_html=True)
 
-
-
-
-
-
+st.markdown("<div id='Backtotop'></div>", unsafe_allow_html=True) 
 
 def local_html(file_name):
     with open(file_name) as f:
@@ -94,9 +90,7 @@ csv = st.cache(suppress_st_warning=True, allow_output_mutation=True)(pd.read_csv
 #Voter Turnout
 st.markdown("<div id='1'></div>", unsafe_allow_html=True) 
 
-voter_head_container=st.container()
-voterh_1,voterh_2,voterh_3=voter_head_container.columns([3.5,2,3])
-voterh_2.title('Voter Turnout')
+st.markdown("""<div style="text-align:center;"><h2>Voter Turnout</h2></div>""", unsafe_allow_html=True) 
 
 voter_container=st.container()
 voter_1,voter_2,voter_3=voter_container.columns([0.5,3,1])
@@ -105,10 +99,14 @@ voter=pd.read_csv('./data/voter.csv')
 config = dict({'scrollZoom': False})
 #voter_2.plotly_chart(map(voter,df_null,'Percentage','',True), use_container_width=True,**{'config': config})
 
-components.html("""
-<iframe title="" aria-label="Map" id="datawrapper-chart-wFZd3" src="https://datawrapper.dwcdn.net/wFZd3/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="729"></iframe>
+def local_html(file_name):
+    with open(file_name) as f:
+        st.markdown('{}'.format(f.read()), unsafe_allow_html=True)
 
-""", height=750)
+local_html("voter.html")
+
+st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
+
 
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
@@ -116,34 +114,36 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 #Constituencies percentage
 st.markdown("<div id='2'></div>", unsafe_allow_html=True) 
 
+st.markdown("""<div style="text-align:center;"><h2>Constituencies</h2></div>""", unsafe_allow_html=True) 
 
 constituencies=pd.read_csv('./data/constituencies.csv')
 constituencies['Percentage']=np.nan
 constituencies['Percentage']=round(constituencies['count_i']*100/ constituencies['total'], 2)
 
+constituencies['Constituency_Type']=constituencies['Constituency_Type'].mask(constituencies['Constituency_Type']=='GEN','General')
+constituencies['Constituency_Type']=constituencies['Constituency_Type'].mask(constituencies['Constituency_Type']=='SC','Scheduled Caste')
+constituencies['Constituency_Type']=constituencies['Constituency_Type'].mask(constituencies['Constituency_Type']=='ST','Scheduled Tribe')
+
 fig = px.bar(constituencies, x="State_Name", y="Percentage",
              color='Constituency_Type', barmode='group',
              height=400, hover_name="Constituency_Type", hover_data={"count_i":True, "total":True, "Constituency_Type":False,"State_Name":False}, 
-             labels = {"count_i":"Count","total":"Total", "type":"", "per":"Percentage"}, 
+             labels = {"count_i":"Category_Constituencies","total":"Total_Constituencies", "type":"", "per":"Percentage"}, 
              color_discrete_map={
-             'GEN': 'lightgreen',
-              'SC': 'yellow',
-                 'ST':'green'}
+             'General': 'lightgreen',
+              'Scheduled Caste': 'yellow',
+                 'Scheduled Tribe':'green'}
             )
 
 fig.update_layout(hovermode=None, plot_bgcolor="White")
 fig.update_xaxes(showline=True, linewidth=1, linecolor='grey')
 fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
 
-const_head_container=st.container()
-const_1,const_2,const_3=const_head_container.columns([3,3,2])
-const_2.title('Constituencies')
-
 
 const_bar_container=st.container()
 const_bar_1,const_bar_2, const_bar_3=const_bar_container.columns([1,3,1])
 const_bar_2.plotly_chart(fig,use_container_width=True)
 
+st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
@@ -152,28 +152,26 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 st.markdown("<div id='3'></div>", unsafe_allow_html=True) 
 
-women_head_container=st.container()
-women_1,women_2,women_3=women_head_container.columns([2.5,3,2])
-women_2.title('Women Winner and Contestants')
-
+st.markdown("""<div style="text-align:center;"><h2>Women Winner and Contestants</h2></div>""", unsafe_allow_html=True) 
 
 women_container=st.container()
 women_1,women_2, women_3=women_container.columns([1,3,1])
 
 contest=pd.read_csv('./data/contestant.csv')
-contest['women_contestant_per']=np.nan
-contest['women_contestant_per']=round(contest['Women']*100/contest['Total'],2)
-contest['women_winner_per']=np.nan
-contest['women_winner_per']=round(contest['Winner']*100/contest['total'],2)
+contest['Women Percentage across Contestants']=np.nan
+contest['Women Percentage across Contestants']=round(contest['Women']*100/contest['Total'],2)
+contest['Women Percentage across Winner']=np.nan
+contest['Women Percentage across Winner']=round(contest['Winner']*100/contest['total'],2)
 contest.rename({'Total':'total_contestant','Women':'women_contestant','Winner':'women_winner','total':'total_winner'}, axis=1, inplace=True)
 
-c_1=contest.groupby(['State_Name','Assembly_No','total_contestant','women_contestant'])['women_contestant_per'].unique().reset_index().explode('women_contestant_per')
-c_1['type']='women_contestant_per'
-c_1.rename({'women_contestant_per':'per'}, axis=1, inplace=True)
 
-c_2=contest.groupby(['State_Name','Assembly_No','women_winner','total_winner'])['women_winner_per'].unique().reset_index().explode('women_winner_per')
-c_2['type']='women_winner_per'
-c_2.rename({'women_winner_per':'per'}, axis=1, inplace=True)
+c_1=contest.groupby(['State_Name','Assembly_No','total_contestant','women_contestant'])['Women Percentage across Contestants'].unique().reset_index().explode('Women Percentage across Contestants')
+c_1['type']='Women Percentage across Contestants'
+c_1.rename({'Women Percentage across Contestants':'per'}, axis=1, inplace=True)
+
+c_2=contest.groupby(['State_Name','Assembly_No','women_winner','total_winner'])['Women Percentage across Winner'].unique().reset_index().explode('Women Percentage across Winner')
+c_2['type']='Women Percentage across Winner'
+c_2.rename({'Women Percentage across Winner':'per'}, axis=1, inplace=True)
 
 c=c_2.append(c_1)
 
@@ -185,14 +183,13 @@ c['contestant']=c['contestant'].mask( (c['total_contestant'].isna()==True), c['t
 c['contestant']=c['contestant'].mask( (c['total_contestant'].isna()==False), c['total_contestant'])
 
 
-
 fig = px.bar(c, x="State_Name", y="per",
              color='type', barmode='group',
              height=400, hover_name="type", hover_data={"winner":True, "contestant":True, "type":False,"State_Name":False}, 
-             labels = {"winner":"women","contestant":"total", "type":"", "per":"Percentage"}, 
+             labels = {"winner":"Women","contestant":"Total", "type":"", "per":"Percentage"}, 
              color_discrete_map={
-             'women_winner_per': 'lightblue',
-              'women_contestant_per': 'purple'
+             'Women Percentage across Winner': 'lightblue',
+              'Women Percentage across Contestants': 'purple'
     })
 
 fig.update_layout(hovermode=None, plot_bgcolor="White")
@@ -202,6 +199,9 @@ fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
 
 women_2.plotly_chart(fig,use_container_width=True)
 
+st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
+
+
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
@@ -209,25 +209,23 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 #Party Seat Share
 st.markdown("<div id='4'></div>", unsafe_allow_html=True) 
 
-
-party_head_container=st.container()
-party_1,party_2,party_3=party_head_container.columns([3,3,2])
-party_2.title('Party Seat Share')
+st.markdown("""<div style="text-align:center;"><h2>Party Seat Share</h2></div>""", unsafe_allow_html=True) 
 
 df_party=csv('./data/party_seat_share.csv')
 fig= px.sunburst(df_party, path=['State_Name','Party','Party_Seat_Percentage'], 
-                 values='Party_Seat',width=600, height=600, color='Party_Seat_Percentage',
-                 color_continuous_scale='Tealgrn'
+                 values='Party_Seat',width=600, height=600, color='State_Name',
+                 color_continuous_scale='Tealgrn', custom_data=['State_Name','Party', 'Party_Seat', 'Party_Seat_Percentage']
                 )
 
-fig.update_traces(insidetextorientation='radial')
-fig.update_layout(hovermode=None)
+fig.update_traces(insidetextorientation='radial',  hovertemplate="<br>".join([
+        "Seat: %{customdata[2]}"
+    ]))
 
 party_seat=st.container()
 party_seat_1,party_seat_2,party_seat_3=party_seat.columns([1,3,1])
 party_seat_2.plotly_chart(fig,use_container_width=True)
 
-
+st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
@@ -236,9 +234,7 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 st.markdown("<div id='5'></div>", unsafe_allow_html=True) 
 
-per_container=st.container()
-per_1,per_2,per_3=per_container.columns([3,3,2])
-per_2.title('Party Seat Share Across States')
+st.markdown("""<div style="text-align:center;"><h2>Party Seat Share Across State</h2></div>""", unsafe_allow_html=True) 
 
 components.html("""
 """, height=10)
@@ -247,7 +243,6 @@ components.html("""
 components.html("""
 <html>
 <head>
-
   
 <style>
 body {
@@ -298,16 +293,13 @@ iframe{
   
 </div>
 
-<br><br>
-
-<div><iframe title="" aria-label="Split Bars" id="datawrapper-chart-gqCpm" src="https://datawrapper.dwcdn.net/gqCpm/2/" scrolling="no" frameborder="0" style="border: none;" width="600" height="96"></iframe></div>
-
 </main>
 </body>
 </html>
 
-""", height=1700)
+""", height=1600)
 
+st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 
 
 
