@@ -133,7 +133,13 @@ fig = px.bar(constituencies, x="State_Name", y="Percentage",
                  'Scheduled Tribe':'green'}
             )
 
-fig.update_layout(hovermode=None, plot_bgcolor="White")
+fig.update_layout(hovermode=None, plot_bgcolor="White", legend=dict(
+    yanchor="bottom",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+))
+
 fig.update_xaxes(showline=True, linewidth=1, linecolor='grey')
 fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
 
@@ -191,16 +197,20 @@ fig = px.bar(c, x="State_Name", y="per",
               'Women Percentage across Contestants': 'purple'
     })
 
-fig.update_layout(hovermode=None, plot_bgcolor="White")
+fig.update_layout(hovermode=None, plot_bgcolor="White", legend=dict(
+    yanchor="bottom",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+))
 fig.update_xaxes(showline=True, linewidth=1, linecolor='grey')
 fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
+
 
 
 women_2.plotly_chart(fig,use_container_width=True)
 
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
-
-
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
