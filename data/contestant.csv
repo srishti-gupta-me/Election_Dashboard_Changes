@@ -1,6 +1,6 @@
-,State_Name,Assembly_No,Total,Women,Winner,total
-0,Goa,7,251,19,2,40
-1,Manipur,12,266,11,2,60
-2,Punjab,15,1145,81,6,117
-3,Uttar Pradesh,17,4853,482,42,403
-4,Uttarakhand,4,637,62,5,70
+,State_Name,Assembly_No,Total Contestants,Contestant_Men,Men Winner,Total Winners,Contestant_Women,Women Winner,Con_M_P,Con_W_P,Win_M_P,Win_W_P
+0,Goa,7,251,232,38,40,19,2,92.43,7.57,95.0,5.0
+1,Manipur,12,266,255,58,60,11,2,95.86,4.14,96.67,3.33
+2,Punjab,15,1145,1063,111,117,81,6,92.84,7.07,94.87,5.13
+3,Uttar Pradesh,17,4853,4370,361,403,482,42,90.05,9.93,89.58,10.42
+4,Uttarakhand,4,637,573,65,70,62,5,89.95,9.73,92.86,7.14

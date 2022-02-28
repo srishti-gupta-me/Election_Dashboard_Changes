@@ -2,16 +2,6 @@
 <html>
 <head>
 
-<script>
-function myFunction() {
-  var x = document.getElementById("myTopnav");
-  if (x.className === "topnav") {
-    x.className += " responsive";
-  } else {
-    x.className = "topnav";
-  }
-}
-</script>
 <style>
 * {
   box-sizing: border-box;
@@ -19,6 +9,24 @@ function myFunction() {
 body{
   font-family: Arial;
 }
+.lokdhaba_link a {
+  float: right;
+  display: block;
+  color: #B83027;
+  text-align: center;
+  padding: 1vh 2vw 1vh 2vw;
+  text-decoration: none;
+  font-size: clamp(10px, 3vw, 17px);
+  border: 3px solid #B83027;
+  margin:0.5em;
+
+}
+
+.lokdhaba_link a:hover {
+  background-color: #B83027;
+  color: white;
+}
+
 
 #title{
 /*  background-color: #ff4c8d; */
@@ -42,14 +50,21 @@ body{
   max-width:700px;
 }
 
+
+
+
 .topnav a {
   float: left;
   display: block;
   color: #f2f2f2;
   text-align: center;
-  padding: 1vh 1vw 1vh 1vw;
+  padding: 1vh 2vw 1vh 2vw;
   text-decoration: none;
   font-size: clamp(10px, 3vw, 17px);
+  border-radius: 20px;
+  background-color: #B83027;
+  margin:0.5em;
+
 }
 
 .active {
@@ -102,12 +117,20 @@ body{
   max-width:100px;
 }
   #click_text{
-/*   background-color: #b5758f; */
+/* background-color: #b5758f; */
   font-size:clamp(10px,3vw, 18px);
-  margin-left:5vw;
+  margin-right:5vw;
   width:90vw;
   text-align:center;
 }
+
+.topnav {
+  overflow: hidden;
+  margin-left:5vw;
+  width:90vw;
+}
+
+
 
  
 }
@@ -143,19 +166,21 @@ body{
   
   .topnav {
   overflow: hidden;
-  background-color: #e68801;
   position:absolute;
+  display:block;
 }
+
 }
 
 @media screen and (max-width: 1100px) 
 {
   .topnav {
   overflow: hidden;
-  background-color: #e68801;
   margin-left:calc(6px + 5vw);
   width:70vw;
+
 }
+
 }
 
 </style>
@@ -163,9 +188,9 @@ body{
 </head>
 <body>
 
-<div id="title"> <h1>Last Assembly Elections at a glance<h1></div>
-<div id="subheading"><h3><i>Metrics from the past</i><h3></div>
-<div id="logo_container"><img  id="logo" src="https://github.com/srishti-gupta-me/Election_Dashboard/blob/main/logo.png?raw=true"></div>
+<div id="title"> <h1> 2017 Assembly Elections at a glance<h1></div>
+<!-- <div id="subheading"><h3><i>Metrics from the past</i><h3></div>  -->
+<div id="logo_container"><a href="https://lokdhaba.ashoka.edu.in/"><img  id="logo" src="https://github.com/srishti-gupta-me/Election_Dashboard/blob/main/logo.png?raw=true"></a></div>
 
   
 <div class="flex-container">
@@ -174,15 +199,15 @@ body{
   </div>
   <div class="flex-item-right">
     <div id="click_text"><p>Click on any of the tabs below to see what the numbers looked like in the last round of elections for the poll bound states of Punjab, Uttarakhand, Uttar Pradesh, Manipur and Goa.</p></div>
-    <div class="topnav" id="myTopnav">
+    <div class="topnav">
       <a href="#1">Voter Turnout</a>
       <a href="#2">Constituencies</a>
-      <a href="#3">Women Representation</a>
+      <a href="#3">Representation by Gender</a>
       <a href="#4">Party Seat Share</a>
-      <a href="#5">Seat Share Across States</a>
-      <!-- <a href="javascript:void(0);" style="font-size:clamp(10px, 3vw, 17px);" class="icon" onclick="myFunction()">&#9776;</a> -->
-    </div>
-    </div>
+      <a href="#5">Seat Share across States (INC & BJP)</a>
+    </div><br><br><br>
+    <div class="lokdhaba_link"><a style="text-decoration: none; "href="https://lokdhaba.ashoka.edu.in/">Go to Lok Dhaba</a></div>
+  </div>
   
 </div>
 

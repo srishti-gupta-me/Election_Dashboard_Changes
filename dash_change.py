@@ -10,6 +10,10 @@ import base64
 import geopandas as gpd
 from plotly.subplots import make_subplots
 import json
+from IPython.display import HTML
+
+
+
 
 
 #Adds favicon to the website and set page title 
@@ -25,6 +29,18 @@ footer {visibility: hidden;}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
+
+
+#Dataframe row indices hide
+
+hide_dataframe_row_index = """
+            <style>
+            .row_heading.level0 {display:none}
+            .blank {display:none}
+            </style>
+            """
+st.markdown(hide_dataframe_row_index, unsafe_allow_html=True)
+
 
 #To reduce padding between containers in the application
 padding = 0
@@ -90,30 +106,38 @@ csv = st.cache(suppress_st_warning=True, allow_output_mutation=True)(pd.read_csv
 #Voter Turnout
 st.markdown("<div id='1'></div>", unsafe_allow_html=True) 
 
-st.markdown("""<div style="text-align:center;"><h2>Voter Turnout</h2></div>""", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align:center;"><h2>Voter turnout</h2></div>""", unsafe_allow_html=True) 
 
-voter_container=st.container()
-voter=pd.read_csv('./data/voter.csv')
+
 
 config = dict({'scrollZoom': False})
-#voter_2.plotly_chart(map(voter,df_null,'Percentage','',True), use_container_width=True,**{'config': config})
 
 def local_html(file_name):
     with open(file_name) as f:
         st.markdown('{}'.format(f.read()), unsafe_allow_html=True)
 
 local_html("voter.html")
+st.markdown("""<br>""", unsafe_allow_html=True)
 
-st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
+voter_container=st.container()
+voter_1, voter_2=voter_container.columns([0.5,1])
+
+voter=pd.read_csv('./data/voter.csv')
+voter['Link to historical data'] = voter['State/Year'].apply(lambda x: f'<a href="https://lokdhaba.ashoka.edu.in/data-vis?et=AE&st={x}&var=Turnout&viz=voterTurnoutChart">Link for {x}</a>')
 
 
+voter_2.write(HTML(voter.to_html(index=False, escape=False)))
+
+
+
+st.markdown("""<br><div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
 #Constituencies percentage
 st.markdown("<div id='2'></div>", unsafe_allow_html=True) 
 
-st.markdown("""<div style="text-align:center;"><h2>Constituencies</h2></div>""", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align:center;"><h2>Number of assembly constituencies</h2></div>""", unsafe_allow_html=True) 
 
 constituencies=pd.read_csv('./data/constituencies.csv')
 constituencies['Percentage']=np.nan
@@ -126,7 +150,7 @@ constituencies['Constituency_Type']=constituencies['Constituency_Type'].mask(con
 fig = px.bar(constituencies, x="State_Name", y="Percentage",
              color='Constituency_Type', barmode='group',
              height=400, hover_name="Constituency_Type", hover_data={"count_i":True, "total":True, "Constituency_Type":False,"State_Name":False}, 
-             labels = {"count_i":"Category_Constituencies","total":"Total_Constituencies", "type":"", "per":"Percentage"}, 
+             labels = {"count_i":"Number of Assembly constituencies for Category","total":"Total Number of Assembly constituencies", "type":"", "per":"Percentage", "State_Name":"State"}, 
              color_discrete_map={
              'General': 'lightgreen',
               'Scheduled Caste': 'yellow',
@@ -157,68 +181,117 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 st.markdown("<div id='3'></div>", unsafe_allow_html=True) 
 
-st.markdown("""<div style="text-align:center;"><h2>Women Winner and Contestants</h2></div>""", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align:center;"><h2>Winners and contestants by gender</h2></div>""", unsafe_allow_html=True) 
 
 women_container=st.container()
-women_1,women_2, women_3=women_container.columns([0.5,3,0.5])
-
-contest=pd.read_csv('./data/contestant.csv')
-contest['Women Percentage across Contestants']=np.nan
-contest['Women Percentage across Contestants']=round(contest['Women']*100/contest['Total'],2)
-contest['Women Percentage across Winner']=np.nan
-contest['Women Percentage across Winner']=round(contest['Winner']*100/contest['total'],2)
-contest.rename({'Total':'total_contestant','Women':'women_contestant','Winner':'women_winner','total':'total_winner'}, axis=1, inplace=True)
+women_1,women_2=women_container.columns([1,1])
 
 
-c_1=contest.groupby(['State_Name','Assembly_No','total_contestant','women_contestant'])['Women Percentage across Contestants'].unique().reset_index().explode('Women Percentage across Contestants')
-c_1['type']='Women Percentage across Contestants'
-c_1.rename({'Women Percentage across Contestants':'per'}, axis=1, inplace=True)
 
-c_2=contest.groupby(['State_Name','Assembly_No','women_winner','total_winner'])['Women Percentage across Winner'].unique().reset_index().explode('Women Percentage across Winner')
-c_2['type']='Women Percentage across Winner'
-c_2.rename({'Women Percentage across Winner':'per'}, axis=1, inplace=True)
+df_contestant=csv('./data/contestant.csv')
+states=df_contestant['State_Name']
 
-c=c_2.append(c_1)
+fig = go.Figure(data=[     go.Bar(name='Female', x=states, y=df_contestant['Con_W_P'], 
+           marker_color='purple',
+          
+          customdata=np.transpose([df_contestant['Con_W_P'],df_contestant['Contestant_Women'],df_contestant['Total Contestants']]),
+           
+            hovertemplate="<br>".join([
+            "Percentage: %{customdata[0]}",
+            "Number of female contestants: %{customdata[1]}",
+            "Total number of contestants: %{customdata[2]}"])
+          ),
+                      
+    go.Bar(name='Male', x=states, y=df_contestant['Con_M_P'], 
+           marker_color='lightblue', 
+           
+           customdata=np.transpose([df_contestant['Con_M_P'],df_contestant['Contestant_Men'],df_contestant['Total Contestants']]),
+           
+            hovertemplate="<br>".join([
+            "Percentage: %{customdata[0]}",
+            "Number of male contestants: %{customdata[1]}",
+            "Total number of contestants: %{customdata[2]}"])
+          )
+])
 
-c['winner']=np.nan
-c['winner']=c['winner'].mask( (c['women_winner'].isna()==True), c['women_contestant'])
-c['winner']=c['winner'].mask( (c['women_winner'].isna()==False), c['women_winner'])
-c['contestant']=np.nan
-c['contestant']=c['contestant'].mask( (c['total_contestant'].isna()==True), c['total_winner'])
-c['contestant']=c['contestant'].mask( (c['total_contestant'].isna()==False), c['total_contestant'])
 
-
-fig = px.bar(c, x="State_Name", y="per",
-             color='type', barmode='group',
-             height=400, hover_name="type", hover_data={"winner":True, "contestant":True, "type":False,"State_Name":False}, 
-             labels = {"winner":"Women","contestant":"Total", "type":"", "per":"Percentage"}, 
-             color_discrete_map={
-             'Women Percentage across Winner': 'lightblue',
-              'Women Percentage across Contestants': 'purple'
-    })
-
-fig.update_layout(hovermode=None, plot_bgcolor="White", legend=dict(
+fig.update_layout(title={
+        'text': "Contestants",
+        'y':0.01,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'bottom'},
+                  
+    hovermode=None, plot_bgcolor="White", legend=dict(
     yanchor="bottom",
     y=0.99,
     xanchor="right",
     x=0.99
-))
-fig.update_xaxes(showline=True, linewidth=1, linecolor='grey')
-fig.update_yaxes(showline=True, linewidth=1, linecolor='grey')
+), barmode='stack')
 
+fig.update_xaxes(title_text="State",showline=True, linewidth=1, linecolor='grey')
+fig.update_yaxes(title_text="Percentage", showline=True, linewidth=1, linecolor='grey')
+
+
+women_1.plotly_chart(fig,use_container_width=True)
+
+
+fig = go.Figure(data=[   
+    go.Bar(name='Female', x=states, y=df_contestant['Win_W_P'], 
+           marker_color='purple',
+          
+          customdata=np.transpose([df_contestant['Win_W_P'],df_contestant['Women Winner'],df_contestant['Total Winners']]),
+           
+            hovertemplate="<br>".join([
+            "Percentage: %{customdata[0]}",
+            "Number of female winner: %{customdata[1]}",
+            "Total number of winner: %{customdata[2]}"])
+          ),
+        go.Bar(name='Male', x=states, y=df_contestant['Win_M_P'], 
+           marker_color='lightblue', 
+           
+           customdata=np.transpose([df_contestant['Win_M_P'],df_contestant['Men Winner'],df_contestant['Total Winners']]),
+           
+            hovertemplate="<br>".join([
+            "Percentage: %{customdata[0]}",
+            "Number of male winner: %{customdata[1]}",
+            "Total number of winner: %{customdata[2]}"])
+          )
+])
+
+
+fig.update_layout(title={
+        'text': "Winners",
+        'y':0.01,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'bottom'}
+    
+    ,hovermode=None, plot_bgcolor="White", legend=dict(
+    yanchor="bottom",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+), barmode='stack')
+
+fig.update_xaxes(title_text="State",showline=True, linewidth=1, linecolor='grey')
+fig.update_yaxes(title_text="Percentage", showline=True, linewidth=1, linecolor='grey')
 
 
 women_2.plotly_chart(fig,use_container_width=True)
-
+st.markdown("""<br>""", unsafe_allow_html=True)
+st.write("Note: Total contestants also contain 4 records marked as 'Other' (Lok Dhaba)")
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 
 
+#
+
 #Party Seat Share
 st.markdown("<div id='4'></div>", unsafe_allow_html=True) 
 
-st.markdown("""<div style="text-align:center;"><h2>Party Seat Share</h2></div>""", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align:center;"><h2>Seat share of top 5 parties</h2></div>""", unsafe_allow_html=True) 
 
 df_party=csv('./data/party_seat_share.csv')
 fig= px.sunburst(df_party, path=['State_Name','Party','Party_Seat_Percentage'], 
@@ -231,8 +304,22 @@ fig.update_traces(insidetextorientation='radial',  hovertemplate="<br>".join([
     ]))
 
 party_seat=st.container()
-party_seat_1,party_seat_2,party_seat_3=party_seat.columns([0.5,3,0.5])
-party_seat_2.plotly_chart(fig,use_container_width=True)
+# party_seat_1,party_seat_2=party_seat.columns([1])
+party_seat.plotly_chart(fig,use_container_width=True)
+
+party_render=pd.read_csv('./data/party_seat_share_render.csv')
+
+# party_seat_2.markdown("""<br><br><br>""", unsafe_allow_html=True)
+
+# party_seat_2.dataframe(party_render.style.format(subset=['Party seat share percentage'], formatter="{:.2f}"), 700, 400)
+party_seat.markdown("""<p>Note:<br>- The remaining parties are clubbed under 'Other'</p>""", unsafe_allow_html=True)
+
+
+
+
+
+
+
 
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
 st.markdown("""<hr/>""", unsafe_allow_html=True)
@@ -243,7 +330,18 @@ st.markdown("""<hr/>""", unsafe_allow_html=True)
 
 st.markdown("<div id='5'></div>", unsafe_allow_html=True) 
 
-st.markdown("""<div style="text-align:center;"><h2>Party Seat Share Across State</h2></div>""", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align:center;"><h2>INC and BJP seat share across states</h2><br><br></div>""", unsafe_allow_html=True)
+
+inc=pd.read_csv('./data/party_seat_share_render_inc.csv')
+bjp=pd.read_csv('./data/party_seat_share_render_bjp.csv')
+
+p_across=st.container()
+
+inc_con, bjp_con=p_across.columns([1,1])
+
+inc_con.dataframe(inc.style.format(subset=['Seat share percentage'], formatter="{:.2f}"), 650, 600)
+bjp_con.dataframe(bjp.style.format(subset=['Seat share percentage'], formatter="{:.2f}"), 650, 600)
+
 
 components.html("""
 """, height=10)
@@ -309,7 +407,5 @@ iframe{
 """, height=1600)
 
 st.markdown("""<div style="text-align:right;"><a href=#Backtotop>Back to top</a><div>""", unsafe_allow_html=True)
-
-
 
 
